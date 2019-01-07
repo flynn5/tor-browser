@@ -1,10 +1,13 @@
 # tor-browser
 
-This repo defines the `flynn5/tor-browser` Docker image.
-
-You can run tor-browser in a container with a command like:
+This repo defines the `flynn5/tor-browser` Docker image which is the tor-browser packaged up within a container.
 
 For MacOSX:
+
+To launch the tor-browser on MacOSX, first ensure XQartz and socat are installed, and socat is running with...
+``` socat TCP-LISTEN:6000,reuseaddr,fork UNIX-CLIENT:\"$DISPLAY\ &" ```
+then
+
 ```
 docker run --rm --name tor-browser \
            -e DISPLAY=docker.for.mac.host.internal:0 \
@@ -20,7 +23,7 @@ docker run --rm --name tor-browser \
            flynn5/tor-browser
 ```
 
-And for unix...
+For unix:
 ```
 docker run --rm --name tor-browser \
            -v /tmp/.X11-unix:/tmp/.X11-unix:ro \
