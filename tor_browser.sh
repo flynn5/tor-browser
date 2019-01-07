@@ -1,10 +1,13 @@
-
 #!/bin/bash
 #
 # Runs Tor browser in a Docker container.
 #
-docker run -it --rm \
+# Note.  This is customized for a MacOSX environment.
+# Ensure XQartz and socat are installed, and socat is running with...
+#  socat TCP-LISTEN:6000,reuseaddr,fork UNIX-CLIENT:\"$DISPLAY\"
+#
+docker run \
+  --rm \ # leave no trace :D
   --name tor-browser \
-  -v /tmp/.X11-unix:/tmp/.X11-unix:ro \
-  -e DISPLAY=unix$DISPLAY \
-  hkjn/tor-browser
+  -e DISPLAY=docker.for.mac.host.internal:0 \ # works only on mac
+  flynn5/tor-browser
