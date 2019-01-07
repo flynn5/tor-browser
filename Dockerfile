@@ -1,11 +1,15 @@
 FROM debian
 
-ENV DEBIAN_FRONTEND=noninteractive HOME=/home/anon
-
-ENV TOR_VERSION=8.5a3
-# Via https://dist.torproject.org/torbrowser/$TOR_VERSION/sha256sums-signed-build.txt
-ENV SHA256_CHECKSUM=5079b8cf7ca0e0430c324dcb25257e39e8a8a98fc2aa6c22aadaf2981ac1adc2
 ENV LANG=C.UTF-8
+
+ENV DEBIAN_FRONTEND=noninteractive 
+
+ENV ANON_USER=anon
+ENV HOME=/home/${ANON_USER}
+ENV TOR_DL=tor.tar.xz
+
+ENV TOR_VERSION=8.0.4
+# The following filenames and URLs may change with TOR_VERSION.  Check!
 ENV RELEASE_FILE=tor-browser-linux64-${TOR_VERSION}_en-US.tar.xz
 ENV RELEASE_URL=https://dist.torproject.org/torbrowser/${TOR_VERSION}/${RELEASE_FILE}
 
@@ -15,33 +19,34 @@ RUN apt-get update && \
       curl \
       file \
       gpg \
+      dirmngr \
       libx11-xcb1 \
       libasound2 \
       libdbus-glib-1-2 \
       libgtk-3-0 \
       libxrender1 \
       libxt6 \
-      xz-utils && \
-    localedef -v -c -i en_US -f UTF-8 en_US.UTF-8 || :
+      xz-utils 
 
-RUN useradd -m -d /home/anon anon
+RUN useradd -m -d ${HOME} ${ANON_USER}
 
-WORKDIR /home/anon
+WORKDIR ${HOME}
 
-RUN gpg --keyserver ha.pool.sks-keyservers.net \
+RUN gpg --batch --keyserver ha.pool.sks-keyservers.net \
       --recv-keys "EF6E 286D DA85 EA2A 4BA7  DE68 4E2C 6E87 9329 8290" && \
-    curl -sSL -o /home/anon/tor.tar.xz \
-      ${RELEASE_FILE} && \
-    curl -sSL -o /home/anon/tor.tar.xz.asc \
-      ${RELEASE_FILE}.asc && \
-    gpg --verify /home/anon/tor.tar.xz.asc && \
-    tar xvf /home/anon/tor.tar.xz && \
-    rm -f /home/anon/tor.tar.xz*
+    curl -sSL -o ${HOME}/${TOR_DL} \
+      ${RELEASE_URL} && \
+    curl -sSL -o ${HOME}/${TOR_DL}.asc \
+      ${RELEASE_URL}.asc && \
+    gpg --batch --verify ${HOME}/${TOR_DL}.asc ${HOME}/${TOR_DL} && \
+    tar xvf ${HOME}/${TOR_DL} && \
+    rm -f ${HOME}/${TOR_DL}*
 
-RUN mkdir /home/anon/Downloads && \
-    chown -R anon:anon /home/anon && \
+RUN mkdir ${HOME}/Downloads && \
+    chown -R ${ANON_USER}:${ANON_USER} ${HOME} && \
     apt-get autoremove
 
-USER anon
+USER ${ANON_USER}
 
-CMD /home/anon/tor-browser_en-US/Browser/start-tor-browser
+CMD ${HOME}/tor-browser_en-US/Browser/start-tor-browser
+
