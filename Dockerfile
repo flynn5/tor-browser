@@ -32,7 +32,7 @@ RUN useradd -m -d ${HOME} ${ANON_USER}
 
 WORKDIR ${HOME}
 
-RUN gpg --batch --keyserver ha.pool.sks-keyservers.net \
+RUN gpg --batch --keyserver hkp://pgp.mit.edu:80 \
       --recv-keys "EF6E 286D DA85 EA2A 4BA7  DE68 4E2C 6E87 9329 8290" && \
     curl -sSL -o ${HOME}/${TOR_DL} \
       ${RELEASE_URL} && \
